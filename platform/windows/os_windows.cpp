@@ -60,6 +60,8 @@
 #include <wbemcli.h>
 #include <wincrypt.h>
 
+#include "modules/godot_tracy/profiler.h"
+
 #ifdef DEBUG_ENABLED
 #pragma pack(push, before_imagehlp, 8)
 #include <imagehlp.h>
@@ -1768,6 +1770,9 @@ void OS_Windows::run() {
 	main_loop->initialize();
 
 	while (true) {
+		FrameMark;
+		ZoneScoped;
+
 		DisplayServer::get_singleton()->process_events(); // get rid of pending events
 		if (Main::iteration()) {
 			break;

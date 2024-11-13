@@ -28,6 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
+#include "modules/godot_tracy/profiler.h"
+
 #include "main.h"
 
 #include "core/config/project_settings.h"
@@ -4349,6 +4351,8 @@ bool Main::iteration() {
 	NavigationServer3D::get_singleton()->sync();
 
 	for (int iters = 0; iters < advance.physics_steps; ++iters) {
+		ZoneScopedN("Main::iteration::PhysicsProcess");
+
 		if (Input::get_singleton()->is_agile_input_event_flushing()) {
 			Input::get_singleton()->flush_buffered_events();
 		}
@@ -4367,19 +4371,23 @@ bool Main::iteration() {
 		PhysicsServer3D::get_singleton()->sync();
 		PhysicsServer3D::get_singleton()->flush_queries();
 #endif // _3D_DISABLED
-
-		PhysicsServer2D::get_singleton()->sync();
-		PhysicsServer2D::get_singleton()->flush_queries();
-
-		if (OS::get_singleton()->get_main_loop()->physics_process(physics_step * time_scale)) {
+		{
+			ZoneScopedN("Main::iteration::PhysicsProcess::sync");
+			PhysicsServer2D::get_singleton()->sync();
+			PhysicsServer2D::get_singleton()->flush_queries();
+		}
+		{
+			ZoneScopedN("Main::iteration::PhysicsProcess::_physics_process");
+			if (OS::get_singleton()->get_main_loop()->physics_process(physics_step * time_scale)) {
 #ifndef _3D_DISABLED
-			PhysicsServer3D::get_singleton()->end_sync();
+				PhysicsServer3D::get_singleton()->end_sync();
 #endif // _3D_DISABLED
-			PhysicsServer2D::get_singleton()->end_sync();
+				PhysicsServer2D::get_singleton()->end_sync();
 
-			Engine::get_singleton()->_in_physics = false;
-			exit = true;
-			break;
+				Engine::get_singleton()->_in_physics = false;
+				exit = true;
+				break;
+			}
 		}
 
 		uint64_t navigation_begin = OS::get_singleton()->get_ticks_usec();
@@ -4395,18 +4403,20 @@ bool Main::iteration() {
 		PhysicsServer3D::get_singleton()->end_sync();
 		PhysicsServer3D::get_singleton()->step(physics_step * time_scale);
 #endif // _3D_DISABLED
+		{
+			ZoneScopedN("Main::iteration::PhysicsProcess::end_sync");
 
-		PhysicsServer2D::get_singleton()->end_sync();
-		PhysicsServer2D::get_singleton()->step(physics_step * time_scale);
+			PhysicsServer2D::get_singleton()->end_sync();
+			PhysicsServer2D::get_singleton()->step(physics_step * time_scale);
 
-		message_queue->flush();
+			message_queue->flush();
+			OS::get_singleton()->get_main_loop()->iteration_end();
 
-		OS::get_singleton()->get_main_loop()->iteration_end();
+			physics_process_ticks = MAX(physics_process_ticks, OS::get_singleton()->get_ticks_usec() - physics_begin); // keep the largest one for reference
+			physics_process_max = MAX(OS::get_singleton()->get_ticks_usec() - physics_begin, physics_process_max);
 
-		physics_process_ticks = MAX(physics_process_ticks, OS::get_singleton()->get_ticks_usec() - physics_begin); // keep the largest one for reference
-		physics_process_max = MAX(OS::get_singleton()->get_ticks_usec() - physics_begin, physics_process_max);
-
-		Engine::get_singleton()->_in_physics = false;
+			Engine::get_singleton()->_in_physics = false;
+		}
 	}
 
 	if (Input::get_singleton()->is_agile_input_event_flushing()) {
@@ -4415,10 +4425,13 @@ bool Main::iteration() {
 
 	uint64_t process_begin = OS::get_singleton()->get_ticks_usec();
 
-	if (OS::get_singleton()->get_main_loop()->process(process_step * time_scale)) {
-		exit = true;
+	{
+		ZoneScopedN("Main::iteration::IdleProcess");
+		if (OS::get_singleton()->get_main_loop()->process(process_step * time_scale)) {
+			exit = true;
+		}
+		message_queue->flush();
 	}
-	message_queue->flush();
 
 	RenderingServer::get_singleton()->sync(); //sync if still drawing from previous frames.
 

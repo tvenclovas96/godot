@@ -28,6 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
+#include "modules/godot_tracy/profiler.h"
+
 #include "godot_physics_server_2d.h"
 
 #include "godot_body_direct_state_2d.h"
@@ -1291,6 +1293,7 @@ void GodotPhysicsServer2D::step(real_t p_step) {
 	if (!active) {
 		return;
 	}
+	ZoneScopedN("Physics server step");
 
 	_update_shapes();
 
@@ -1306,6 +1309,7 @@ void GodotPhysicsServer2D::step(real_t p_step) {
 }
 
 void GodotPhysicsServer2D::sync() {
+	ZoneScoped;
 	doing_sync = true;
 }
 
@@ -1313,6 +1317,7 @@ void GodotPhysicsServer2D::flush_queries() {
 	if (!active) {
 		return;
 	}
+	ZoneScoped;
 
 	flushing_queries = true;
 
@@ -1360,6 +1365,8 @@ void GodotPhysicsServer2D::flush_queries() {
 }
 
 void GodotPhysicsServer2D::end_sync() {
+	ZoneScoped;
+
 	doing_sync = false;
 }
 

@@ -28,6 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
+#include "modules/godot_tracy/profiler.h"
+
 #include "godot_step_2d.h"
 
 #include "core/object/worker_thread_pool.h"
@@ -126,6 +128,7 @@ void GodotStep2D::_check_suspend(LocalVector<GodotBody2D *> &p_body_island) cons
 }
 
 void GodotStep2D::step(GodotSpace2D *p_space, real_t p_delta) {
+	ZoneScopedN("Stepper step");
 	p_space->lock(); // can't access space during this
 
 	p_space->setup(); //update inertias, etc
