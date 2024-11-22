@@ -581,6 +581,35 @@ public:
 
 	virtual JointType joint_get_type(RID p_joint) const = 0;
 
+	/* CF_RAYCAST API */
+
+	virtual RID cfraycast_create() = 0;
+	virtual void cfraycast_clear(RID p_cfraycast) = 0;
+
+	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to, bool keep_active) = 0;
+
+	virtual void cfraycast_set_position(RID p_cfraycast, const Vector2 &p_point) = 0;
+	virtual Vector2 cfraycast_get_position(RID p_cfraycast) const = 0;
+
+	virtual void cfraycast_set_target_position(RID p_cfraycast, const Vector2 &p_point) = 0;
+	virtual Vector2 cfraycast_get_target_position(RID p_cfraycast) const = 0;
+
+	virtual void cfraycast_set_collision_mask(RID p_cfraycast, uint32_t p_mask) = 0;
+	virtual uint32_t cfraycast_get_collision_mask(RID p_cfraycast) const = 0;
+
+	virtual void cfraycast_set_hit_from_inside(RID p_cfraycast, bool p_enable) = 0;
+	virtual bool cfraycast_is_hit_from_inside_enabled(RID p_cfraycast) const = 0;
+
+	virtual void cfraycast_activate(RID p_cfraycast, bool p_single_frame) = 0;
+	virtual void cfraycast_deactivate(RID p_cfraycast) = 0;
+
+	virtual bool cfraycast_is_colliding(RID p_cfraycast) const = 0;
+	virtual RID cfraycast_get_collider_rid(RID p_cfraycast) const = 0;
+	virtual Vector2 cfraycast_get_collision_point(RID p_cfraycast) const = 0;
+	virtual Vector2 cfraycast_get_collision_normal(RID p_cfraycast) const = 0;
+
+	// virtual void cfraycast_set_intersect_callback(RID p_cfraycast, const Callable &p_callback) = 0;
+
 	/* QUERY API */
 
 	enum AreaBodyStatus {
@@ -612,6 +641,26 @@ public:
 
 	PhysicsServer2D();
 	~PhysicsServer2D();
+};
+
+struct CFRaycastData {
+	Vector2 from;
+	Vector2 to;
+
+	uint32_t collision_mask = _UI32_MAX;
+
+	bool enabled = true;
+	bool keep_enabled = true;
+	bool hit_from_inside = false;
+};
+
+struct CFRaycastResult {
+	RID collider_rid;
+	Vector2 position;
+	Vector2 normal;
+	int shape = 0;
+
+	_ALWAYS_INLINE_ bool is_colliding() const { return !collider_rid.is_null(); }
 };
 
 class PhysicsRayQueryParameters2D : public RefCounted {

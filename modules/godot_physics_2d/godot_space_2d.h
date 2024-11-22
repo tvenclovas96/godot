@@ -50,6 +50,8 @@ public:
 	virtual bool collide_shape(const ShapeParameters &p_parameters, Vector2 *r_results, int p_result_max, int &r_result_count) override;
 	virtual bool rest_info(const ShapeParameters &p_parameters, ShapeRestInfo *r_info) override;
 
+	void intersect_ray_lean(const CFRaycastData &p_parameters, CFRaycastResult &r_result);
+
 	GodotPhysicsDirectSpaceState2D() {}
 };
 
@@ -61,6 +63,7 @@ public:
 		ELAPSED_TIME_SETUP_CONSTRAINTS,
 		ELAPSED_TIME_SOLVE_CONSTRAINTS,
 		ELAPSED_TIME_INTEGRATE_VELOCITIES,
+		ELAPSED_TIME_CAST_RAYS,
 		ELAPSED_TIME_MAX
 
 	};

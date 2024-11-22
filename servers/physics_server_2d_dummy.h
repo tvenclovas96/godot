@@ -323,6 +323,35 @@ public:
 
 	virtual JointType joint_get_type(RID p_joint) const override { return JointType::JOINT_TYPE_PIN; }
 
+	/* CF_RAYCAST APID */
+
+	virtual RID cfraycast_create() override { return RID(); }
+	virtual void cfraycast_clear(RID p_cfraycast) override {}
+
+	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to, bool keep_active) override {}
+
+	virtual void cfraycast_set_position(RID p_cfraycast, const Vector2 &p_point) override {}
+	virtual Vector2 cfraycast_get_position(RID p_cfraycast) const override { return Vector2(); }
+
+	virtual void cfraycast_set_target_position(RID p_cfraycast, const Vector2 &p_point) override {}
+	virtual Vector2 cfraycast_get_target_position(RID p_cfraycast) const override { return Vector2(); }
+
+	virtual void cfraycast_set_collision_mask(RID p_cfraycast, uint32_t p_mask) override {}
+	virtual uint32_t cfraycast_get_collision_mask(RID p_cfraycast) const override { return 0; }
+
+	virtual void cfraycast_set_hit_from_inside(RID p_cfraycast, bool p_enable) override {}
+	virtual bool cfraycast_is_hit_from_inside_enabled(RID p_cfraycast) const override { return false; }
+
+	virtual void cfraycast_activate(RID p_cfraycast, bool p_keep_active) override {}
+	virtual void cfraycast_deactivate(RID p_cfraycast) override {}
+
+	virtual bool cfraycast_is_colliding(RID p_cfraycast) const override { return false; }
+	virtual RID cfraycast_get_collider_rid(RID p_cfraycast) const override { return RID(); }
+	virtual Vector2 cfraycast_get_collision_point(RID p_cfraycast) const override { return Vector2(); }
+	virtual Vector2 cfraycast_get_collision_normal(RID p_cfraycast) const override { return Vector2(); }
+
+	// virtual void cfraycast_set_intersect_callback(RID p_cfraycast, const Callable &p_callback) override {}
+
 	/* MISC */
 
 	virtual void free(RID p_rid) override {}

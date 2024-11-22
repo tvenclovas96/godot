@@ -300,6 +300,35 @@ public:
 
 	FUNC1RC(JointType, joint_get_type, RID);
 
+	/* CF_RAYCAST API */
+
+	FUNCRID(cfraycast)
+	FUNC1(cfraycast_clear, RID)
+
+	FUNC4(cfraycast_set_ray, RID, const Vector2 &, const Vector2 &, bool);
+
+	FUNC2(cfraycast_set_position, RID, const Vector2 &);
+	FUNC1RC(Vector2, cfraycast_get_position, RID);
+
+	FUNC2(cfraycast_set_target_position, RID, const Vector2 &);
+	FUNC1RC(Vector2, cfraycast_get_target_position, RID);
+
+	FUNC2(cfraycast_set_collision_mask, RID, uint32_t);
+	FUNC1RC(uint32_t, cfraycast_get_collision_mask, RID);
+
+	FUNC2(cfraycast_set_hit_from_inside, RID, bool);
+	FUNC1RC(bool, cfraycast_is_hit_from_inside_enabled, RID);
+
+	FUNC2(cfraycast_activate, RID, bool);
+	FUNC1(cfraycast_deactivate, RID);
+
+	FUNC1RC(bool, cfraycast_is_colliding, RID);
+	FUNC1RC(RID, cfraycast_get_collider_rid, RID);
+	FUNC1RC(Vector2, cfraycast_get_collision_point, RID);
+	FUNC1RC(Vector2, cfraycast_get_collision_normal, RID);
+
+	// FUNC2(cfraycast_set_intersect_callback, RID, const Callable &);
+
 	/* MISC */
 
 	FUNC1(free, RID);

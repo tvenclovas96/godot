@@ -428,6 +428,35 @@ public:
 
 	EXBIND1RC(JointType, joint_get_type, RID)
 
+	/* CF_RAYCAST API */
+
+	EXBIND0R(RID, cfraycast_create)
+	EXBIND1(cfraycast_clear, RID)
+
+	EXBIND4(cfraycast_set_ray, RID, const Vector2 &, const Vector2 &, bool)
+
+	EXBIND2(cfraycast_set_position, RID, const Vector2 &)
+	EXBIND1RC(Vector2, cfraycast_get_position, RID)
+
+	EXBIND2(cfraycast_set_target_position, RID, const Vector2 &)
+	EXBIND1RC(Vector2, cfraycast_get_target_position, RID)
+
+	EXBIND2(cfraycast_set_collision_mask, RID, uint32_t)
+	EXBIND1RC(uint32_t, cfraycast_get_collision_mask, RID)
+
+	EXBIND2(cfraycast_set_hit_from_inside, RID, bool)
+	EXBIND1RC(bool, cfraycast_is_hit_from_inside_enabled, RID)
+
+	EXBIND2(cfraycast_activate, RID, bool)
+	EXBIND1(cfraycast_deactivate, RID)
+
+	EXBIND1RC(bool, cfraycast_is_colliding, RID)
+	EXBIND1RC(RID, cfraycast_get_collider_rid, RID)
+	EXBIND1RC(Vector2, cfraycast_get_collision_point, RID)
+	EXBIND1RC(Vector2, cfraycast_get_collision_normal, RID)
+
+	// EXBIND2(cfraycast_set_intersect_callback, RID, const Callable &)
+
 	/* MISC */
 
 	GDVIRTUAL1_REQUIRED(_free_rid, RID)

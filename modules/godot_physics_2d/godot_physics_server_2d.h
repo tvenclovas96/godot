@@ -35,6 +35,7 @@
 #include "godot_space_2d.h"
 #include "godot_step_2d.h"
 
+#include "cf_raycaster_2d.h"
 #include "core/templates/rid_owner.h"
 #include "servers/physics_server_2d.h"
 
@@ -62,6 +63,8 @@ class GodotPhysicsServer2D : public PhysicsServer2D {
 	mutable RID_PtrOwner<GodotArea2D, true> area_owner;
 	mutable RID_PtrOwner<GodotBody2D, true> body_owner{ 65536, 1048576 };
 	mutable RID_PtrOwner<GodotJoint2D, true> joint_owner;
+
+	mutable CFRaycaster2D cf_raycasts;
 
 	static GodotPhysicsServer2D *godot_singleton;
 
@@ -282,6 +285,37 @@ public:
 	virtual real_t damped_spring_joint_get_param(RID p_joint, DampedSpringParam p_param) const override;
 
 	virtual JointType joint_get_type(RID p_joint) const override;
+
+	/* CF RAYCAST API */
+
+	virtual RID cfraycast_create() override;
+	virtual void cfraycast_clear(RID p_cfraycast) override;
+
+	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to, bool p_keep_active) override;
+
+	virtual void cfraycast_set_position(RID p_cfraycast, const Vector2 &p_point) override;
+	virtual Vector2 cfraycast_get_position(RID p_cfraycast) const override;
+
+	virtual void cfraycast_set_target_position(RID p_cfraycast, const Vector2 &p_point) override;
+	virtual Vector2 cfraycast_get_target_position(RID p_cfraycast) const override;
+
+	virtual void cfraycast_set_collision_mask(RID p_cfraycast, uint32_t p_mask) override;
+	virtual uint32_t cfraycast_get_collision_mask(RID p_cfraycast) const override;
+
+	virtual void cfraycast_set_hit_from_inside(RID p_cfraycast, bool p_enable) override;
+	virtual bool cfraycast_is_hit_from_inside_enabled(RID p_cfraycast) const override;
+
+	virtual void cfraycast_activate(RID p_cfraycast, bool p_keep_active) override;
+	virtual void cfraycast_deactivate(RID p_cfraycast) override;
+
+	virtual bool cfraycast_is_colliding(RID p_cfraycast) const override;
+	virtual RID cfraycast_get_collider_rid(RID p_cfraycast) const override;
+	virtual Vector2 cfraycast_get_collision_point(RID p_cfraycast) const override;
+	virtual Vector2 cfraycast_get_collision_normal(RID p_cfraycast) const override;
+
+	// virtual void cfraycast_set_intersect_callback(RID p_cfraycast, const Callable &p_callback) override {}
+
+	// set sync state callback?
 
 	/* MISC */
 

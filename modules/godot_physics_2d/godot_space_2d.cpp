@@ -501,6 +501,90 @@ bool GodotPhysicsDirectSpaceState2D::rest_info(const ShapeParameters &p_paramete
 	return true;
 }
 
+void GodotPhysicsDirectSpaceState2D::intersect_ray_lean(const CFRaycastData &p_parameters, CFRaycastResult &r_result) {
+	ERR_FAIL_COND(space->locked);
+
+	Vector2 begin, end;
+	Vector2 normal;
+	begin = p_parameters.from;
+	end = p_parameters.to;
+	normal = (end - begin).normalized();
+
+	int amount = space->broadphase->cull_segment(begin, end, space->intersection_query_results, GodotSpace2D::INTERSECTION_QUERY_MAX, space->intersection_query_subindex_results);
+
+	//todo, create another array that references results, compute AABBs and check closest point to ray origin, sort, and stop evaluating results when beyond first collision
+
+	bool collided = false;
+	Vector2 res_point, res_normal;
+	int res_shape = -1;
+	const GodotCollisionObject2D *res_obj = nullptr;
+	real_t min_d = 1e10;
+
+	for (int i = 0; i < amount; i++) {
+		if (!_can_collide_with(space->intersection_query_results[i], p_parameters.collision_mask, true, false)) {
+			continue;
+		}
+
+		const GodotCollisionObject2D *col_obj = space->intersection_query_results[i];
+
+		int shape_idx = space->intersection_query_subindex_results[i];
+		Transform2D inv_xform = col_obj->get_shape_inv_transform(shape_idx) * col_obj->get_inv_transform();
+
+		Vector2 local_from = inv_xform.xform(begin);
+		Vector2 local_to = inv_xform.xform(end);
+
+		const GodotShape2D *shape = col_obj->get_shape(shape_idx);
+
+		Vector2 shape_point, shape_normal;
+
+		if (shape->contains_point(local_from)) {
+			if (p_parameters.hit_from_inside) {
+				// Hit shape at starting point.
+				min_d = 0;
+				res_point = begin;
+				res_normal = Vector2();
+				res_shape = shape_idx;
+				res_obj = col_obj;
+				collided = true;
+				break;
+			} else {
+				// Ignore shape when starting inside.
+				continue;
+			}
+		}
+
+		if (shape->intersect_segment(local_from, local_to, shape_point, shape_normal)) {
+			Transform2D xform = col_obj->get_transform() * col_obj->get_shape_transform(shape_idx);
+			shape_point = xform.xform(shape_point);
+
+			real_t ld = normal.dot(shape_point);
+
+			if (ld < min_d) {
+				min_d = ld;
+				res_point = shape_point;
+				res_normal = inv_xform.basis_xform_inv(shape_normal).normalized();
+				res_shape = shape_idx;
+				res_obj = col_obj;
+				collided = true;
+			}
+		}
+	}
+
+	if (!collided) {
+		r_result.collider_rid = RID();
+		r_result.normal = Vector2();
+		r_result.position = Vector2();
+		r_result.shape = 0;
+		return;
+	}
+	//ERR_FAIL_NULL_V(res_obj, false); // Shouldn't happen but silences warning.
+
+	r_result.collider_rid = res_obj->get_self();
+	r_result.normal = res_normal;
+	r_result.position = res_point;
+	r_result.shape = res_shape;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int GodotSpace2D::_cull_aabb_for_body(GodotBody2D *p_body, const Rect2 &p_aabb) {
