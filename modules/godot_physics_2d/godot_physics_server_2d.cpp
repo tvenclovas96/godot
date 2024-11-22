@@ -1219,6 +1219,112 @@ PhysicsServer2D::JointType GodotPhysicsServer2D::joint_get_type(RID p_joint) con
 	return joint->get_type();
 }
 
+/* CF_RAYCAST API */
+
+RID GodotPhysicsServer2D::cfraycast_create() {
+	return cf_raycasts.create_ray();
+}
+
+void GodotPhysicsServer2D::cfraycast_clear(RID p_cfraycast) {
+	bool success = cf_raycasts.clear_ray(p_cfraycast);
+	ERR_FAIL_COND_MSG(!success, "Tried to clear non-existent cf-ray");
+}
+
+void GodotPhysicsServer2D::cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to, bool p_keep_active) {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL(data);
+	data->from = p_from;
+	data->to = p_to;
+	cfraycast_activate(p_cfraycast, p_keep_active);
+}
+
+void GodotPhysicsServer2D::cfraycast_set_position(RID p_cfraycast, const Vector2 &p_point) {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL(data);
+	data->from = p_point;
+}
+
+Vector2 GodotPhysicsServer2D::cfraycast_get_position(RID p_cfraycast) const {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL_V(data, Vector2());
+	return data->from;
+}
+
+void GodotPhysicsServer2D::cfraycast_set_target_position(RID p_cfraycast, const Vector2 &p_point) {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL(data);
+	data->to = p_point;
+}
+
+Vector2 GodotPhysicsServer2D::cfraycast_get_target_position(RID p_cfraycast) const {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL_V(data, Vector2());
+	return data->to;
+}
+
+void GodotPhysicsServer2D::cfraycast_set_collision_mask(RID p_cfraycast, uint32_t p_mask) {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL(data);
+	data->collision_mask = p_mask;
+}
+
+uint32_t GodotPhysicsServer2D::cfraycast_get_collision_mask(RID p_cfraycast) const {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL_V(data, 0);
+	return data->collision_mask;
+}
+
+void GodotPhysicsServer2D::cfraycast_set_hit_from_inside(RID p_cfraycast, bool p_enable) {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL(data);
+	data->collision_mask = p_enable;
+}
+
+bool GodotPhysicsServer2D::cfraycast_is_hit_from_inside_enabled(RID p_cfraycast) const {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL_V(data, false);
+	return data->hit_from_inside;
+}
+
+void GodotPhysicsServer2D::cfraycast_activate(RID p_cfraycast, bool p_keep_active) {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL(data);
+	data->enabled = true;
+	data->keep_enabled = p_keep_active;
+}
+
+void GodotPhysicsServer2D::cfraycast_deactivate(RID p_cfraycast) {
+	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+	ERR_FAIL_NULL(data);
+	data->enabled = false;
+}
+
+bool GodotPhysicsServer2D::cfraycast_is_colliding(RID p_cfraycast) const {
+	CFRaycastResult *result = cf_raycasts.get_result_ptr(p_cfraycast);
+	ERR_FAIL_NULL_V(result, false);
+	return result->is_colliding();
+}
+
+RID GodotPhysicsServer2D::cfraycast_get_collider_rid(RID p_cfraycast) const {
+	CFRaycastResult *result = cf_raycasts.get_result_ptr(p_cfraycast);
+	ERR_FAIL_NULL_V(result, RID());
+	return result->collider_rid;
+}
+
+Vector2 GodotPhysicsServer2D::cfraycast_get_collision_point(RID p_cfraycast) const {
+	CFRaycastResult *result = cf_raycasts.get_result_ptr(p_cfraycast);
+	ERR_FAIL_NULL_V(result, Vector2());
+	return result->position;
+}
+
+Vector2 GodotPhysicsServer2D::cfraycast_get_collision_normal(RID p_cfraycast) const {
+	CFRaycastResult *result = cf_raycasts.get_result_ptr(p_cfraycast);
+	ERR_FAIL_NULL_V(result, Vector2());
+	return result->normal;
+}
+
+/* MISC */
+
 void GodotPhysicsServer2D::free(RID p_rid) {
 	_update_shapes(); // just in case
 
@@ -1302,6 +1408,8 @@ void GodotPhysicsServer2D::step(real_t p_step) {
 		island_count += E->get_island_count();
 		active_objects += E->get_active_objects();
 		collision_pairs += E->get_collision_pairs();
+
+		cf_raycasts.intersect_rays(const_cast<GodotSpace2D *>(E));
 	}
 }
 
@@ -1331,7 +1439,8 @@ void GodotPhysicsServer2D::flush_queries() {
 			"generate_islands",
 			"setup_constraints",
 			"solve_constraints",
-			"integrate_velocities"
+			"integrate_velocities",
+			"cast_rays"
 		};
 
 		for (int i = 0; i < GodotSpace2D::ELAPSED_TIME_MAX; i++) {
