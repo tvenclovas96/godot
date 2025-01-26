@@ -37,6 +37,8 @@
 #include "godot_area_pair_2d.h"
 #include "godot_body_pair_2d.h"
 
+#include "core/object/worker_thread_pool.h"
+
 #define TEST_MOTION_MARGIN_MIN_VALUE 0.0001
 #define TEST_MOTION_MIN_CONTACT_DEPTH_FACTOR 0.05
 
@@ -1093,6 +1095,10 @@ bool GodotSpace2D::test_body_motion(GodotBody2D *p_body, const PhysicsServer2D::
 	return collided;
 }
 
+void GodotSpace2D::_call_area_queries_threaded(uint32_t i, void *p_userdata) {
+	monitor_query_list_fast[i]->call_queries_fast();
+}
+
 // Assumes a valid collision pair, this should have been checked beforehand in the BVH or octree.
 void *GodotSpace2D::_broadphase_pair(GodotCollisionObject2D *A, int p_subindex_A, GodotCollisionObject2D *B, int p_subindex_B, void *p_self) {
 	GodotCollisionObject2D::Type type_A = A->get_type();
@@ -1189,6 +1195,14 @@ void GodotSpace2D::area_remove_from_monitor_query_list(SelfList<GodotArea2D> *p_
 	monitor_query_list.remove(p_area);
 }
 
+void GodotSpace2D::area_add_to_monitor_query_list_fast(GodotArea2D *p_area) {
+	monitor_query_list_fast.push_back(p_area);
+}
+
+void GodotSpace2D::area_remove_from_monitor_query_list_fast(GodotArea2D *p_area) {
+	monitor_query_list_fast.remove_at_unordered(monitor_query_list_fast.find(p_area));
+}
+
 void GodotSpace2D::area_add_to_moved_list(SelfList<GodotArea2D> *p_area) {
 	area_moved_list.add(p_area);
 }
@@ -1212,6 +1226,14 @@ void GodotSpace2D::call_queries() {
 		GodotArea2D *a = monitor_query_list.first()->self();
 		monitor_query_list.remove(monitor_query_list.first());
 		a->call_queries();
+	}
+
+	if (monitor_query_list_fast.size() > 0) {
+		WorkerThreadPool::GroupID group_task = WorkerThreadPool::get_singleton()->add_template_group_task(
+				this, &GodotSpace2D::_call_area_queries_threaded, nullptr, monitor_query_list_fast.size(), -1, true, SNAME("MonitorQueriesFast"));
+		WorkerThreadPool::get_singleton()->wait_for_group_task_completion(group_task);
+
+		monitor_query_list_fast.clear();
 	}
 }
 

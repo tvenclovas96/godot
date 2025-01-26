@@ -642,6 +642,10 @@ void RendererCanvasCull::canvas_item_set_transform(RID p_item, const Transform2D
 	canvas_item->xform_curr = p_transform;
 }
 
+void RendererCanvasCull::canvas_item_set_transform_unsafe(RID p_item, const Transform2D &p_transform) {
+	canvas_item_set_transform(p_item, p_transform);
+}
+
 void RendererCanvasCull::canvas_item_set_visibility_layer(RID p_item, uint32_t p_visibility_layer) {
 	Item *canvas_item = canvas_item_owner.get_or_null(p_item);
 	ERR_FAIL_NULL(canvas_item);
