@@ -37,6 +37,8 @@ public:
 	void intersect_rays(GodotSpace2D *p_space);
 
 private:
+	constexpr static uint32_t chunk_size = 1024;
+	uint32_t chunks = 0;
 	uint64_t rid_counter = 0; // just always increment
 
 	// initialize with decent starting capacity
@@ -45,7 +47,7 @@ private:
 
 	GodotPhysicsDirectSpaceState2D *current_space = nullptr;
 
-	void _intersect_threaded(uint32_t i, void *p_userdata);
+	void _intersect(uint32_t i);
 
 public:
 	CFRaycaster2D() {}

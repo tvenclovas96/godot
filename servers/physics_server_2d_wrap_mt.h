@@ -147,6 +147,10 @@ public:
 
 	FUNC3(area_set_param, RID, AreaParameter, const Variant &);
 	FUNC2(area_set_transform, RID, const Transform2D &);
+	FUNC2_UNSAFE(area_set_transform_unsafe, RID, const Transform2D &);
+
+	FUNC2(area_set_position, RID, const Vector2 &);
+	FUNC2_UNSAFE(area_set_position_unsafe, RID, const Vector2 &);
 
 	FUNC2RC(Variant, area_get_param, RID, AreaParameter);
 	FUNC1RC(Transform2D, area_get_transform, RID);
@@ -161,6 +165,7 @@ public:
 	FUNC2(area_set_pickable, RID, bool);
 
 	FUNC2(area_set_monitor_callback, RID, const Callable &);
+	FUNC2(area_set_monitor_callback_fast, RID, const Callable &);
 	FUNC2(area_set_area_monitor_callback, RID, const Callable &);
 
 	/* BODY API */
@@ -213,6 +218,12 @@ public:
 
 	FUNC3(body_set_state, RID, BodyState, const Variant &);
 	FUNC2RC(Variant, body_get_state, RID, BodyState);
+	FUNC2RC_UNSAFE(Variant, body_get_state_unsafe, RID, BodyState);
+	FUNC1RC_UNSAFE(Transform2D, body_get_transform_unsafe, RID);
+	FUNC1RC_UNSAFE(Vector2, body_get_position_unsafe, RID);
+
+	FUNC2_UNSAFE(body_set_linear_velocity_unsafe, RID, const Vector2 &);
+	FUNC1RC_UNSAFE(Vector2, body_get_linear_velocity_unsafe, RID);
 
 	FUNC2(body_apply_central_impulse, RID, const Vector2 &);
 	FUNC2(body_apply_torque_impulse, RID, real_t);
@@ -323,7 +334,14 @@ public:
 	FUNC1(cfraycast_deactivate, RID);
 
 	FUNC1RC(bool, cfraycast_is_colliding, RID);
+	FUNC1RC_UNSAFE(bool, cfraycast_is_colliding_unsafe, RID);
+
 	FUNC1RC(RID, cfraycast_get_collider_rid, RID);
+	FUNC1RC_UNSAFE(RID, cfraycast_get_collider_rid_unsafe, RID);
+
+	FUNC1RC(RID, cfraycast_get_collider_rid_or_default, RID);
+	FUNC1RC_UNSAFE(RID, cfraycast_get_collider_rid_or_default_unsafe, RID);
+
 	FUNC1RC(Vector2, cfraycast_get_collision_point, RID);
 	FUNC1RC(Vector2, cfraycast_get_collision_normal, RID);
 

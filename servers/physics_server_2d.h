@@ -330,6 +330,10 @@ public:
 
 	virtual void area_set_param(RID p_area, AreaParameter p_param, const Variant &p_value) = 0;
 	virtual void area_set_transform(RID p_area, const Transform2D &p_transform) = 0;
+	virtual void area_set_transform_unsafe(RID p_area, const Transform2D &p_transform) = 0;
+
+	virtual void area_set_position(RID p_area, const Vector2 &p_position) = 0;
+	virtual void area_set_position_unsafe(RID p_area, const Vector2 &p_position) = 0;
 
 	virtual Variant area_get_param(RID p_parea, AreaParameter p_param) const = 0;
 	virtual Transform2D area_get_transform(RID p_area) const = 0;
@@ -344,6 +348,7 @@ public:
 	virtual void area_set_pickable(RID p_area, bool p_pickable) = 0;
 
 	virtual void area_set_monitor_callback(RID p_area, const Callable &p_callback) = 0;
+	virtual void area_set_monitor_callback_fast(RID p_area, const Callable &p_callback) = 0;
 	virtual void area_set_area_monitor_callback(RID p_area, const Callable &p_callback) = 0;
 
 	/* BODY API */
@@ -439,6 +444,13 @@ public:
 
 	virtual void body_set_state(RID p_body, BodyState p_state, const Variant &p_variant) = 0;
 	virtual Variant body_get_state(RID p_body, BodyState p_state) const = 0;
+
+	virtual Variant body_get_state_unsafe(RID p_body, BodyState p_state) const = 0;
+	virtual Transform2D body_get_transform_unsafe(RID p_body) const = 0;
+	virtual Vector2 body_get_position_unsafe(RID p_body) const = 0;
+
+	virtual void body_set_linear_velocity_unsafe(RID p_body, const Vector2 &p_velocity) = 0;
+	virtual Vector2 body_get_linear_velocity_unsafe(RID p_body) const = 0;
 
 	virtual void body_apply_central_impulse(RID p_body, const Vector2 &p_impulse) = 0;
 	virtual void body_apply_torque_impulse(RID p_body, real_t p_torque) = 0;
@@ -604,7 +616,14 @@ public:
 	virtual void cfraycast_deactivate(RID p_cfraycast) = 0;
 
 	virtual bool cfraycast_is_colliding(RID p_cfraycast) const = 0;
+	virtual bool cfraycast_is_colliding_unsafe(RID p_cfraycast) const = 0;
+
 	virtual RID cfraycast_get_collider_rid(RID p_cfraycast) const = 0;
+	virtual RID cfraycast_get_collider_rid_unsafe(RID p_cfraycast) const = 0;
+
+	virtual RID cfraycast_get_collider_rid_or_default(RID p_cfraycast) const = 0;
+	virtual RID cfraycast_get_collider_rid_or_default_unsafe(RID p_cfraycast) const = 0;
+
 	virtual Vector2 cfraycast_get_collision_point(RID p_cfraycast) const = 0;
 	virtual Vector2 cfraycast_get_collision_normal(RID p_cfraycast) const = 0;
 

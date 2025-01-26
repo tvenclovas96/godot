@@ -85,7 +85,10 @@ private:
 	SelfList<GodotBody2D>::List mass_properties_update_list;
 	SelfList<GodotBody2D>::List state_query_list;
 	SelfList<GodotArea2D>::List monitor_query_list;
+	LocalVector<GodotArea2D *> monitor_query_list_fast;
 	SelfList<GodotArea2D>::List area_moved_list;
+
+	void _call_area_queries_threaded(uint32_t i, void *p_userdata);
 
 	static void *_broadphase_pair(GodotCollisionObject2D *A, int p_subindex_A, GodotCollisionObject2D *B, int p_subindex_B, void *p_self);
 	static void _broadphase_unpair(GodotCollisionObject2D *A, int p_subindex_A, GodotCollisionObject2D *B, int p_subindex_B, void *p_data, void *p_self);
@@ -149,6 +152,9 @@ public:
 
 	void area_add_to_monitor_query_list(SelfList<GodotArea2D> *p_area);
 	void area_remove_from_monitor_query_list(SelfList<GodotArea2D> *p_area);
+
+	void area_add_to_monitor_query_list_fast(GodotArea2D *p_area);
+	void area_remove_from_monitor_query_list_fast(GodotArea2D *p_area);
 
 	GodotBroadPhase2D *get_broadphase();
 

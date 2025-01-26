@@ -162,6 +162,11 @@
 		}                                                                           \
 	}
 
+#define FUNC1RC_UNSAFE(m_r, m_type, m_arg1)        \
+	virtual m_r m_type(m_arg1 p1) const override { \
+		return server_name->m_type(p1);            \
+	}
+
 #define FUNC1S(m_type, m_arg1)                                                 \
 	virtual void m_type(m_arg1 p1) override {                                  \
 		WRITE_ACTION                                                           \
@@ -237,6 +242,11 @@
 		}                                                                               \
 	}
 
+#define FUNC2RC_UNSAFE(m_r, m_type, m_arg1, m_arg2)           \
+	virtual m_r m_type(m_arg1 p1, m_arg2 p2) const override { \
+		return server_name->m_type(p1, p2);                   \
+	}
+
 #define FUNC2S(m_type, m_arg1, m_arg2)                                             \
 	virtual void m_type(m_arg1 p1, m_arg2 p2) override {                           \
 		WRITE_ACTION                                                               \
@@ -271,6 +281,11 @@
 			command_queue.flush_if_pending();                             \
 			server_name->m_type(p1, p2);                                  \
 		}                                                                 \
+	}
+
+#define FUNC2_UNSAFE(m_type, m_arg1, m_arg2)             \
+	virtual void m_type(m_arg1 p1, m_arg2 p2) override { \
+		server_name->m_type(p1, p2);                     \
 	}
 
 #define FUNC2C(m_type, m_arg1, m_arg2)                                    \

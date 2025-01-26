@@ -54,11 +54,13 @@ class GodotArea2D : public GodotCollisionObject2D {
 	bool monitorable = false;
 
 	Callable monitor_callback;
+	Callable monitor_callback_lean;
 
 	Callable area_monitor_callback;
 
 	SelfList<GodotArea2D> monitor_query_list;
 	SelfList<GodotArea2D> moved_list;
+	bool monitor_query_fast_queued = false;
 
 	struct BodyKey {
 		RID rid;
@@ -96,11 +98,16 @@ class GodotArea2D : public GodotCollisionObject2D {
 	virtual void _shapes_changed() override;
 	void _queue_monitor_update();
 
+	void _queue_monitor_update_lean();
+
 	void _set_space_override_mode(PhysicsServer2D::AreaSpaceOverrideMode &r_mode, PhysicsServer2D::AreaSpaceOverrideMode p_new_mode);
 
 public:
 	void set_monitor_callback(const Callable &p_callback);
 	_FORCE_INLINE_ bool has_monitor_callback() const { return monitor_callback.is_valid(); }
+
+	void set_monitor_callback_lean(const Callable &p_callback);
+	_FORCE_INLINE_ bool has_monitor_callback_lean() const { return monitor_callback_lean.is_valid(); }
 
 	void set_area_monitor_callback(const Callable &p_callback);
 	_FORCE_INLINE_ bool has_area_monitor_callback() const { return area_monitor_callback.is_valid(); }
@@ -149,6 +156,8 @@ public:
 
 	void call_queries();
 
+	void call_queries_fast(); // barely faster than regular, but indicates usage is parallel-friendly
+
 	void compute_gravity(const Vector2 &p_position, Vector2 &r_gravity) const;
 
 	GodotArea2D();
@@ -158,7 +167,12 @@ public:
 void GodotArea2D::add_body_to_query(GodotBody2D *p_body, uint32_t p_body_shape, uint32_t p_area_shape) {
 	BodyKey bk(p_body, p_body_shape, p_area_shape);
 	monitored_bodies[bk].inc();
-	if (!monitor_query_list.in_list()) {
+	if (has_monitor_callback_lean()) {
+		if (get_space() && !monitor_query_fast_queued) {
+			_queue_monitor_update_lean();
+		}
+	}
+	if (get_space() && !monitor_query_list.in_list()) {
 		_queue_monitor_update();
 	}
 }
@@ -166,6 +180,11 @@ void GodotArea2D::add_body_to_query(GodotBody2D *p_body, uint32_t p_body_shape, 
 void GodotArea2D::remove_body_from_query(GodotBody2D *p_body, uint32_t p_body_shape, uint32_t p_area_shape) {
 	BodyKey bk(p_body, p_body_shape, p_area_shape);
 	monitored_bodies[bk].dec();
+	if (has_monitor_callback_lean()) {
+		if (get_space() && !monitor_query_fast_queued) {
+			_queue_monitor_update_lean();
+		}
+	}
 	if (get_space() && !monitor_query_list.in_list()) {
 		_queue_monitor_update();
 	}

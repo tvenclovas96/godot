@@ -453,6 +453,14 @@ void GodotPhysicsServer2D::area_set_transform(RID p_area, const Transform2D &p_t
 	area->set_transform(p_transform);
 }
 
+void GodotPhysicsServer2D::area_set_position(RID p_area, const Vector2 &p_position) {
+	GodotArea2D *area = area_owner.get_or_null(p_area);
+	ERR_FAIL_NULL(area);
+	Transform2D xform = area->get_transform();
+	xform.set_origin(p_position);
+	area->set_transform(xform);
+}
+
 Variant GodotPhysicsServer2D::area_get_param(RID p_area, AreaParameter p_param) const {
 	if (space_owner.owns(p_area)) {
 		GodotSpace2D *space = space_owner.get_or_null(p_area);
@@ -518,6 +526,13 @@ void GodotPhysicsServer2D::area_set_monitor_callback(RID p_area, const Callable 
 	ERR_FAIL_NULL(area);
 
 	area->set_monitor_callback(p_callback.is_valid() ? p_callback : Callable());
+}
+
+void GodotPhysicsServer2D::area_set_monitor_callback_fast(RID p_area, const Callable &p_callback) {
+	GodotArea2D *area = area_owner.get_or_null(p_area);
+	ERR_FAIL_NULL(area);
+
+	area->set_monitor_callback_lean(p_callback.is_valid() ? p_callback : Callable());
 }
 
 void GodotPhysicsServer2D::area_set_area_monitor_callback(RID p_area, const Callable &p_callback) {
@@ -779,6 +794,38 @@ Variant GodotPhysicsServer2D::body_get_state(RID p_body, BodyState p_state) cons
 	ERR_FAIL_NULL_V(body, Variant());
 
 	return body->get_state(p_state);
+}
+
+Variant GodotPhysicsServer2D::body_get_state_unsafe(RID p_body, BodyState p_state) const {
+	return body_get_state(p_body, p_state);
+}
+
+Transform2D GodotPhysicsServer2D::body_get_transform_unsafe(RID p_body) const {
+	GodotBody2D *body = body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL_V(body, Transform2D());
+
+	return body->get_transform();
+}
+
+Vector2 GodotPhysicsServer2D::body_get_position_unsafe(RID p_body) const {
+	GodotBody2D *body = body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL_V(body, Vector2());
+
+	return body->get_transform().get_origin();
+}
+
+Vector2 GodotPhysicsServer2D::body_get_linear_velocity_unsafe(RID p_body) const {
+	GodotBody2D *body = body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL_V(body, Vector2());
+
+	return body->get_linear_velocity();
+}
+
+void GodotPhysicsServer2D::body_set_linear_velocity_unsafe(RID p_body, const Vector2 &p_velocity) {
+	GodotBody2D *body = body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL(body);
+
+	body->set_linear_velocity(p_velocity);
 }
 
 void GodotPhysicsServer2D::body_apply_central_impulse(RID p_body, const Vector2 &p_impulse) {
@@ -1309,6 +1356,11 @@ RID GodotPhysicsServer2D::cfraycast_get_collider_rid(RID p_cfraycast) const {
 	CFRaycastResult *result = cf_raycasts.get_result_ptr(p_cfraycast);
 	ERR_FAIL_NULL_V(result, RID());
 	return result->collider_rid;
+}
+
+RID GodotPhysicsServer2D::cfraycast_get_collider_rid_or_default(RID p_cfraycast) const {
+	CFRaycastResult *result = cf_raycasts.get_result_ptr(p_cfraycast);
+	return result == nullptr ? RID() : result->collider_rid;
 }
 
 Vector2 GodotPhysicsServer2D::cfraycast_get_collision_point(RID p_cfraycast) const {
