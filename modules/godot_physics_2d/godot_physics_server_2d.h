@@ -150,6 +150,7 @@ public:
 
 	virtual void area_set_param(RID p_area, AreaParameter p_param, const Variant &p_value) override;
 	virtual void area_set_transform(RID p_area, const Transform2D &p_transform) override;
+	virtual void area_set_transform_unsafe(RID p_area, const Transform2D &p_transform) override;
 
 	virtual Variant area_get_param(RID p_area, AreaParameter p_param) const override;
 	virtual Transform2D area_get_transform(RID p_area) const override;
@@ -162,6 +163,7 @@ public:
 	virtual uint32_t area_get_collision_mask(RID p_area) const override;
 
 	virtual void area_set_monitor_callback(RID p_area, const Callable &p_callback) override;
+	virtual void area_set_monitor_callback_fast(RID p_area, const Callable &p_callback) override;
 	virtual void area_set_area_monitor_callback(RID p_area, const Callable &p_callback) override;
 
 	virtual void area_set_pickable(RID p_area, bool p_pickable) override;
@@ -216,6 +218,13 @@ public:
 
 	virtual void body_set_state(RID p_body, BodyState p_state, const Variant &p_variant) override;
 	virtual Variant body_get_state(RID p_body, BodyState p_state) const override;
+
+	virtual Variant body_get_state_unsafe(RID p_body, BodyState p_state) const override;
+	virtual Transform2D body_get_transform_unsafe(RID p_body) const override;
+	virtual Vector2 body_get_position_unsafe(RID p_body) const override;
+
+	virtual Vector2 body_get_linear_velocity_unsafe(RID p_body) const override;
+	virtual void body_set_linear_velocity_unsafe(RID p_body, const Vector2 &p_velocity) override;
 
 	virtual void body_apply_central_impulse(RID p_body, const Vector2 &p_impulse) override;
 	virtual void body_apply_torque_impulse(RID p_body, real_t p_torque) override;
@@ -310,6 +319,7 @@ public:
 	virtual void cfraycast_deactivate(RID p_cfraycast) override;
 
 	virtual bool cfraycast_is_colliding(RID p_cfraycast) const override;
+	virtual bool cfraycast_is_colliding_unsafe(RID p_cfraycast) const override;
 	virtual RID cfraycast_get_collider_rid(RID p_cfraycast) const override;
 	virtual Vector2 cfraycast_get_collision_point(RID p_cfraycast) const override;
 	virtual Vector2 cfraycast_get_collision_normal(RID p_cfraycast) const override;

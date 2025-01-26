@@ -66,6 +66,9 @@ void GodotArea2D::set_space(GodotSpace2D *p_space) {
 		if (monitor_query_list.in_list()) {
 			get_space()->area_remove_from_monitor_query_list(&monitor_query_list);
 		}
+		if (monitor_query_fast_queued) {
+			get_space()->area_remove_from_monitor_query_list_fast(this);
+		}
 		if (moved_list.in_list()) {
 			get_space()->area_remove_from_moved_list(&moved_list);
 		}
@@ -73,6 +76,7 @@ void GodotArea2D::set_space(GodotSpace2D *p_space) {
 
 	monitored_bodies.clear();
 	monitored_areas.clear();
+	monitor_query_fast_queued = false;
 
 	_set_space(p_space);
 }
@@ -80,7 +84,25 @@ void GodotArea2D::set_space(GodotSpace2D *p_space) {
 void GodotArea2D::set_monitor_callback(const Callable &p_callback) {
 	_unregister_shapes();
 
+	monitor_callback_lean = Callable(); // keep mutually exclusive
 	monitor_callback = p_callback;
+
+	monitored_bodies.clear();
+	monitored_areas.clear();
+
+	_shape_changed();
+
+	if (!moved_list.in_list() && get_space()) {
+		get_space()->area_add_to_moved_list(&moved_list);
+	}
+}
+
+void GodotArea2D::set_monitor_callback_lean(const Callable &p_callback) {
+	_unregister_shapes();
+
+	monitor_callback = Callable(); // keep mutually exclusive
+	monitor_callback_lean = p_callback;
+	monitor_query_fast_queued = false;
 
 	monitored_bodies.clear();
 	monitored_areas.clear();
@@ -180,11 +202,12 @@ Variant GodotArea2D::get_param(PhysicsServer2D::AreaParameter p_param) const {
 }
 
 void GodotArea2D::_queue_monitor_update() {
-	ERR_FAIL_NULL(get_space());
+	get_space()->area_add_to_monitor_query_list(&monitor_query_list);
+}
 
-	if (!monitor_query_list.in_list()) {
-		get_space()->area_add_to_monitor_query_list(&monitor_query_list);
-	}
+void GodotArea2D::_queue_monitor_update_lean() {
+	get_space()->area_add_to_monitor_query_list_fast(this);
+	monitor_query_fast_queued = true;
 }
 
 void GodotArea2D::set_monitorable(bool p_monitorable) {
@@ -281,6 +304,49 @@ void GodotArea2D::call_queries() {
 			area_monitor_callback = Callable();
 		}
 	}
+}
+
+// can't really de-variant, but usage still indicates it is safe to thread
+void GodotArea2D::call_queries_fast() {
+	if (!monitor_callback_lean.is_null() && !monitored_bodies.is_empty()) {
+		if (monitor_callback_lean.is_valid()) {
+			Variant res[2];
+			Variant *resptr[2];
+			for (int i = 0; i < 2; i++) {
+				resptr[i] = &res[i];
+			}
+
+			for (HashMap<BodyKey, BodyState, BodyKey>::Iterator E = monitored_bodies.begin(); E;) {
+				if (E->value.state == 0) { // Nothing happened
+					HashMap<BodyKey, BodyState, BodyKey>::Iterator next = E;
+					++next;
+					monitored_bodies.remove(E);
+					E = next;
+					continue;
+				}
+
+				res[0] = E->value.state > 0 ? PhysicsServer2D::AREA_BODY_ADDED : PhysicsServer2D::AREA_BODY_REMOVED;
+				res[1] = E->key.rid;
+
+				HashMap<BodyKey, BodyState, BodyKey>::Iterator next = E;
+				++next;
+				monitored_bodies.remove(E);
+				E = next;
+
+				Callable::CallError ce;
+				Variant ret;
+				monitor_callback_lean.callp((const Variant **)resptr, 2, ret, ce);
+
+				if (ce.error != Callable::CallError::CALL_OK) {
+					ERR_PRINT_ONCE("Error calling event callback method " + Variant::get_callable_error_text(monitor_callback, (const Variant **)resptr, 5, ce));
+				}
+			}
+		} else {
+			monitored_bodies.clear();
+			monitor_callback = Callable();
+		}
+	}
+	monitor_query_fast_queued = false;
 }
 
 void GodotArea2D::compute_gravity(const Vector2 &p_position, Vector2 &r_gravity) const {

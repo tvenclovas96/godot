@@ -8,13 +8,14 @@ void CFRaycaster2D::intersect_rays(GodotSpace2D *p_space) {
 	current_space = p_space->get_direct_state();
 	// Currently, non-threaded approach is slightly faster (due to cache-coherency?)
 	// test extensively once intersect logic is trimmed down
-	// perhaps manually designating larger slices of the array to threads would work best
 
-	// WorkerThreadPool::GroupID group_task = WorkerThreadPool::get_singleton()->add_template_group_task(this, &CFRaycaster2D::_intersect_threaded, nullptr, ray_data.size(), -1, true, SNAME("ThreadedIntersect"));
+	// chunks = ray_data.size() / chunk_size;
+	// WorkerThreadPool::GroupID group_task = WorkerThreadPool::get_singleton()->add_template_group_task(
+	// 		this, &CFRaycaster2D::_intersect_threaded, nullptr, chunks + 1, -1, true, SNAME("ThreadedIntersect"));
 	// WorkerThreadPool::get_singleton()->wait_for_group_task_completion(group_task);
 
 	for (uint32_t i = 0; i < ray_data.size(); i++) {
-		_intersect_threaded(i, nullptr);
+		_intersect(i);
 	}
 
 	{ //profile
@@ -24,7 +25,26 @@ void CFRaycaster2D::intersect_rays(GodotSpace2D *p_space) {
 	}
 }
 
-void CFRaycaster2D::_intersect_threaded(uint32_t i, void *p_userdata) {
+void CFRaycaster2D::_intersect_threaded(uint32_t chunk, void *p_userdata) {
+	if (chunk < chunks) {
+		for (uint32_t i = 0; i < chunk_size; i++) {
+			uint32_t index = i + chunk * chunk_size;
+			_intersect(index);
+		}
+
+	} else {
+		for (uint32_t i = 0;; i++) {
+			uint32_t index = i + chunk * chunk_size;
+			if (index >= ray_data.size()) {
+				break;
+			}
+
+			_intersect(index);
+		}
+	}
+}
+
+void CFRaycaster2D::_intersect(uint32_t i) {
 	CFRaycastData &data = ray_data.get_by_index(i).value;
 
 	// collider data is reset only on explicit non-collision

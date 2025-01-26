@@ -264,6 +264,7 @@ public:
 
 	EXBIND3(area_set_param, RID, AreaParameter, const Variant &)
 	EXBIND2(area_set_transform, RID, const Transform2D &)
+	EXBIND2(area_set_transform_unsafe, RID, const Transform2D &)
 
 	EXBIND2RC(Variant, area_get_param, RID, AreaParameter)
 	EXBIND1RC(Transform2D, area_get_transform, RID)
@@ -278,6 +279,7 @@ public:
 	EXBIND2(area_set_pickable, RID, bool)
 
 	EXBIND2(area_set_monitor_callback, RID, const Callable &)
+	EXBIND2(area_set_monitor_callback_fast, RID, const Callable &)
 	EXBIND2(area_set_area_monitor_callback, RID, const Callable &)
 
 	/* BODY API */
@@ -330,6 +332,13 @@ public:
 
 	EXBIND3(body_set_state, RID, BodyState, const Variant &)
 	EXBIND2RC(Variant, body_get_state, RID, BodyState)
+
+	EXBIND2RC(Variant, body_get_state_unsafe, RID, BodyState)
+	EXBIND1RC(Transform2D, body_get_transform_unsafe, RID)
+	EXBIND1RC(Vector2, body_get_position_unsafe, RID)
+
+	EXBIND2(body_set_linear_velocity_unsafe, RID, const Vector2 &)
+	EXBIND1RC(Vector2, body_get_linear_velocity_unsafe, RID)
 
 	EXBIND2(body_apply_central_impulse, RID, const Vector2 &)
 	EXBIND2(body_apply_torque_impulse, RID, real_t)
@@ -452,6 +461,7 @@ public:
 	EXBIND1(cfraycast_deactivate, RID)
 
 	EXBIND1RC(bool, cfraycast_is_colliding, RID)
+	EXBIND1RC(bool, cfraycast_is_colliding_unsafe, RID)
 	EXBIND1RC(RID, cfraycast_get_collider_rid, RID)
 	EXBIND1RC(Vector2, cfraycast_get_collision_point, RID)
 	EXBIND1RC(Vector2, cfraycast_get_collision_normal, RID)

@@ -49,7 +49,7 @@ bool GodotAreaPair2D::setup(real_t p_step) {
 		}
 		process_collision = has_space_override;
 
-		if (area->has_monitor_callback()) {
+		if (area->has_monitor_callback_lean() || area->has_monitor_callback()) {
 			process_collision = true;
 		}
 
@@ -70,7 +70,7 @@ bool GodotAreaPair2D::pre_solve(real_t p_step) {
 			body->add_area(area);
 		}
 
-		if (area->has_monitor_callback()) {
+		if (area->has_monitor_callback_lean() || area->has_monitor_callback()) {
 			area->add_body_to_query(body, body_shape, area_shape);
 		}
 	} else {
@@ -79,7 +79,7 @@ bool GodotAreaPair2D::pre_solve(real_t p_step) {
 			body->remove_area(area);
 		}
 
-		if (area->has_monitor_callback()) {
+		if (area->has_monitor_callback_lean() || area->has_monitor_callback()) {
 			area->remove_body_from_query(body, body_shape, area_shape);
 		}
 	}
