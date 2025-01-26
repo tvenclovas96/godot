@@ -781,6 +781,24 @@ Variant GodotPhysicsServer2D::body_get_state(RID p_body, BodyState p_state) cons
 	return body->get_state(p_state);
 }
 
+Variant GodotPhysicsServer2D::body_get_state_unsafe(RID p_body, BodyState p_state) const {
+	return body_get_state(p_body, p_state);
+}
+
+Transform2D GodotPhysicsServer2D::body_get_transform_unsafe(RID p_body) const {
+	GodotBody2D *body = body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL_V(body, Transform2D());
+
+	return body->get_transform();
+}
+
+Vector2 GodotPhysicsServer2D::body_get_position_unsafe(RID p_body) const {
+	GodotBody2D *body = body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL_V(body, Vector2());
+
+	return body->get_transform().get_origin();
+}
+
 void GodotPhysicsServer2D::body_apply_central_impulse(RID p_body, const Vector2 &p_impulse) {
 	GodotBody2D *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_NULL(body);
@@ -1303,6 +1321,10 @@ bool GodotPhysicsServer2D::cfraycast_is_colliding(RID p_cfraycast) const {
 	CFRaycastResult *result = cf_raycasts.get_result_ptr(p_cfraycast);
 	ERR_FAIL_NULL_V(result, false);
 	return result->is_colliding();
+}
+
+bool GodotPhysicsServer2D::cfraycast_is_colliding_unsafe(RID p_cfraycast) const {
+	return cfraycast_is_colliding(p_cfraycast);
 }
 
 RID GodotPhysicsServer2D::cfraycast_get_collider_rid(RID p_cfraycast) const {

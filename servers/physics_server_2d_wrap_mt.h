@@ -214,6 +214,9 @@ public:
 
 	FUNC3(body_set_state, RID, BodyState, const Variant &);
 	FUNC2RC(Variant, body_get_state, RID, BodyState);
+	FUNC2RC_UNSAFE(Variant, body_get_state_unsafe, RID, BodyState);
+	FUNC1RC_UNSAFE(Transform2D, body_get_transform_unsafe, RID);
+	FUNC1RC_UNSAFE(Vector2, body_get_position_unsafe, RID);
 
 	FUNC2(body_apply_central_impulse, RID, const Vector2 &);
 	FUNC2(body_apply_torque_impulse, RID, real_t);
@@ -324,6 +327,7 @@ public:
 	FUNC1(cfraycast_deactivate, RID);
 
 	FUNC1RC(bool, cfraycast_is_colliding, RID);
+	FUNC1RC_UNSAFE(bool, cfraycast_is_colliding_unsafe, RID);
 	FUNC1RC(RID, cfraycast_get_collider_rid, RID);
 	FUNC1RC(Vector2, cfraycast_get_collision_point, RID);
 	FUNC1RC(Vector2, cfraycast_get_collision_normal, RID);

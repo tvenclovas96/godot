@@ -438,6 +438,9 @@ public:
 
 	virtual void body_set_state(RID p_body, BodyState p_state, const Variant &p_variant) = 0;
 	virtual Variant body_get_state(RID p_body, BodyState p_state) const = 0;
+	virtual Variant body_get_state_unsafe(RID p_body, BodyState p_state) const = 0;
+	virtual Transform2D body_get_transform_unsafe(RID p_body) const = 0;
+	virtual Vector2 body_get_position_unsafe(RID p_body) const = 0;
 
 	virtual void body_apply_central_impulse(RID p_body, const Vector2 &p_impulse) = 0;
 	virtual void body_apply_torque_impulse(RID p_body, real_t p_torque) = 0;
@@ -603,6 +606,7 @@ public:
 	virtual void cfraycast_deactivate(RID p_cfraycast) = 0;
 
 	virtual bool cfraycast_is_colliding(RID p_cfraycast) const = 0;
+	virtual bool cfraycast_is_colliding_unsafe(RID p_cfraycast) const = 0;
 	virtual RID cfraycast_get_collider_rid(RID p_cfraycast) const = 0;
 	virtual Vector2 cfraycast_get_collision_point(RID p_cfraycast) const = 0;
 	virtual Vector2 cfraycast_get_collision_normal(RID p_cfraycast) const = 0;

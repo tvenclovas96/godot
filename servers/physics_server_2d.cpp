@@ -723,6 +723,9 @@ void PhysicsServer2D::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("body_set_state", "body", "state", "value"), &PhysicsServer2D::body_set_state);
 	ClassDB::bind_method(D_METHOD("body_get_state", "body", "state"), &PhysicsServer2D::body_get_state);
+	ClassDB::bind_method(D_METHOD("body_get_state_unsafe", "body", "state"), &PhysicsServer2D::body_get_state_unsafe);
+	ClassDB::bind_method(D_METHOD("body_get_transform_unsafe", "body"), &PhysicsServer2D::body_get_transform_unsafe);
+	ClassDB::bind_method(D_METHOD("body_get_position_unsafe", "body"), &PhysicsServer2D::body_get_position_unsafe);
 
 	ClassDB::bind_method(D_METHOD("body_apply_central_impulse", "body", "impulse"), &PhysicsServer2D::body_apply_central_impulse);
 	ClassDB::bind_method(D_METHOD("body_apply_torque_impulse", "body", "impulse"), &PhysicsServer2D::body_apply_torque_impulse);
@@ -811,6 +814,7 @@ void PhysicsServer2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("cfraycast_deactivate", "cfraycast"), &PhysicsServer2D::cfraycast_deactivate);
 
 	ClassDB::bind_method(D_METHOD("cfraycast_is_colliding", "cfraycast"), &PhysicsServer2D::cfraycast_is_colliding);
+	ClassDB::bind_method(D_METHOD("cfraycast_is_colliding_unsafe", "cfraycast"), &PhysicsServer2D::cfraycast_is_colliding_unsafe);
 	ClassDB::bind_method(D_METHOD("cfraycast_get_collider_rid", "cfraycast"), &PhysicsServer2D::cfraycast_get_collider_rid);
 	ClassDB::bind_method(D_METHOD("cfraycast_get_collision_point", "cfraycast"), &PhysicsServer2D::cfraycast_get_collision_point);
 	ClassDB::bind_method(D_METHOD("cfraycast_get_collision_normal", "cfraycast"), &PhysicsServer2D::cfraycast_get_collision_normal);

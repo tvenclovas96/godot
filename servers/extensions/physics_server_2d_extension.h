@@ -330,6 +330,9 @@ public:
 
 	EXBIND3(body_set_state, RID, BodyState, const Variant &)
 	EXBIND2RC(Variant, body_get_state, RID, BodyState)
+	EXBIND2RC(Variant, body_get_state_unsafe, RID, BodyState)
+	EXBIND1RC(Transform2D, body_get_transform_unsafe, RID)
+	EXBIND1RC(Vector2, body_get_position_unsafe, RID)
 
 	EXBIND2(body_apply_central_impulse, RID, const Vector2 &)
 	EXBIND2(body_apply_torque_impulse, RID, real_t)
@@ -452,6 +455,7 @@ public:
 	EXBIND1(cfraycast_deactivate, RID)
 
 	EXBIND1RC(bool, cfraycast_is_colliding, RID)
+	EXBIND1RC(bool, cfraycast_is_colliding_unsafe, RID)
 	EXBIND1RC(RID, cfraycast_get_collider_rid, RID)
 	EXBIND1RC(Vector2, cfraycast_get_collision_point, RID)
 	EXBIND1RC(Vector2, cfraycast_get_collision_normal, RID)
