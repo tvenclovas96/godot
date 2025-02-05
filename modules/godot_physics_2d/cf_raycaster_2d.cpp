@@ -6,17 +6,14 @@ void CFRaycaster2D::intersect_rays(GodotSpace2D *p_space) {
 	uint64_t profile_endtime = 0;
 
 	current_space = p_space->get_direct_state();
-	// Currently, non-threaded approach is slightly faster (due to cache-coherency?)
-	// test extensively once intersect logic is trimmed down
+	// Threading is now a lot faster but we had to remove a mutex lock in the bvh culling step (teehee)
 
-	// chunks = ray_data.size() / chunk_size;
-	// WorkerThreadPool::GroupID group_task = WorkerThreadPool::get_singleton()->add_template_group_task(
-	// 		this, &CFRaycaster2D::_intersect_threaded, nullptr, chunks + 1, -1, true, SNAME("ThreadedIntersect"));
-	// WorkerThreadPool::get_singleton()->wait_for_group_task_completion(group_task);
-
-	for (uint32_t i = 0; i < ray_data.size(); i++) {
-		_intersect(i);
-	}
+	// since typically ~4/5 rays will be disabled, and no intersect will be done, it's very slightly more efficient to give
+	// a thread a chunk of the array to process, as opposed to a single entry and have it just return most of the time
+	chunks = ray_data.size() / chunk_size;
+	WorkerThreadPool::GroupID group_task = WorkerThreadPool::get_singleton()->add_template_group_task(
+			this, &CFRaycaster2D::_intersect_threaded, nullptr, chunks + 1, -1, true, SNAME("ThreadedIntersect"));
+	WorkerThreadPool::get_singleton()->wait_for_group_task_completion(group_task);
 
 	{ //profile
 		profile_endtime = OS::get_singleton()->get_ticks_usec();
@@ -26,6 +23,7 @@ void CFRaycaster2D::intersect_rays(GodotSpace2D *p_space) {
 }
 
 void CFRaycaster2D::_intersect_threaded(uint32_t chunk, void *p_userdata) {
+	// only check if in bounds of size if this is the last chunk
 	if (chunk < chunks) {
 		for (uint32_t i = 0; i < chunk_size; i++) {
 			uint32_t index = i + chunk * chunk_size;

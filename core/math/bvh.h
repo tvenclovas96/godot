@@ -364,21 +364,10 @@ public:
 
 	int cull_segment(const POINT &p_from, const POINT &p_to, T **p_result_array, int p_result_max, const T *p_tester, uint32_t p_tree_collision_mask = 0xFFFFFFFF, int *p_subindex_array = nullptr) {
 		BVH_LOCKED_FUNCTION
-		typename BVHTREE_CLASS::CullParams params;
-
-		params.result_count_overall = 0;
-		params.result_max = p_result_max;
-		params.result_array = p_result_array;
-		params.subindex_array = p_subindex_array;
-		params.tester = p_tester;
-		params.tree_collision_mask = p_tree_collision_mask;
-
-		params.segment.from = p_from;
-		params.segment.to = p_to;
-
-		tree.cull_segment(params);
-
-		return params.result_count_overall;
+		return cull_segment_internal(p_result_max, p_result_array, p_subindex_array, p_tester, p_tree_collision_mask, p_from, p_to);
+	}
+	int cull_segment_unsafe(const POINT &p_from, const POINT &p_to, T **p_result_array, int p_result_max, const T *p_tester, uint32_t p_tree_collision_mask = 0xFFFFFFFF, int *p_subindex_array = nullptr) {
+		return cull_segment_internal(p_result_max, p_result_array, p_subindex_array, p_tester, p_tree_collision_mask, p_from, p_to);
 	}
 
 	int cull_point(const POINT &p_point, T **p_result_array, int p_result_max, const T *p_tester, uint32_t p_tree_collision_mask = 0xFFFFFFFF, int *p_subindex_array = nullptr) {
@@ -428,6 +417,25 @@ public:
 	}
 
 private:
+	// to avoid duplicating code
+	int cull_segment_internal(int &p_result_max, T **&p_result_array, int *&p_subindex_array, const T *&p_tester, uint32_t &p_tree_collision_mask, const POINT &p_from, const POINT &p_to) {
+		typename BVHTREE_CLASS::CullParams params;
+
+		params.result_count_overall = 0;
+		params.result_max = p_result_max;
+		params.result_array = p_result_array;
+		params.subindex_array = p_subindex_array;
+		params.tester = p_tester;
+		params.tree_collision_mask = p_tree_collision_mask;
+
+		params.segment.from = p_from;
+		params.segment.to = p_to;
+
+		tree.cull_segment(params);
+
+		return params.result_count_overall;
+	}
+
 	// do this after moving etc.
 	void _check_for_collisions(bool p_full_check = false) {
 		if (!changed_items.size()) {
