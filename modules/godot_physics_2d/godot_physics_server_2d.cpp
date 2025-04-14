@@ -1277,12 +1277,13 @@ void GodotPhysicsServer2D::cfraycast_clear(RID p_cfraycast) {
 	ERR_FAIL_COND_MSG(!success, "Tried to clear non-existent cf-ray");
 }
 
-void GodotPhysicsServer2D::cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to, bool p_keep_active) {
+void GodotPhysicsServer2D::cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to) {
 	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
+
 	ERR_FAIL_NULL(data);
 	data->from = p_from;
 	data->to = p_to;
-	cfraycast_activate(p_cfraycast, p_keep_active);
+	data->enabled = true;
 }
 
 void GodotPhysicsServer2D::cfraycast_set_position(RID p_cfraycast, const Vector2 &p_point) {
@@ -1324,7 +1325,7 @@ uint32_t GodotPhysicsServer2D::cfraycast_get_collision_mask(RID p_cfraycast) con
 void GodotPhysicsServer2D::cfraycast_set_hit_from_inside(RID p_cfraycast, bool p_enable) {
 	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
 	ERR_FAIL_NULL(data);
-	data->collision_mask = p_enable;
+	data->hit_from_inside = p_enable;
 }
 
 bool GodotPhysicsServer2D::cfraycast_is_hit_from_inside_enabled(RID p_cfraycast) const {
@@ -1333,11 +1334,10 @@ bool GodotPhysicsServer2D::cfraycast_is_hit_from_inside_enabled(RID p_cfraycast)
 	return data->hit_from_inside;
 }
 
-void GodotPhysicsServer2D::cfraycast_activate(RID p_cfraycast, bool p_keep_active) {
+void GodotPhysicsServer2D::cfraycast_activate(RID p_cfraycast) {
 	CFRaycastData *data = cf_raycasts.get_data_ptr(p_cfraycast);
 	ERR_FAIL_NULL(data);
 	data->enabled = true;
-	data->keep_enabled = p_keep_active;
 }
 
 void GodotPhysicsServer2D::cfraycast_deactivate(RID p_cfraycast) {
@@ -1430,7 +1430,8 @@ void GodotPhysicsServer2D::free(RID p_rid) {
 
 		joint_owner.free(p_rid);
 		memdelete(joint);
-
+	} else if (cf_raycasts.clear_ray(p_rid)) {
+		// true if delete
 	} else {
 		ERR_FAIL_MSG("Invalid ID.");
 	}
