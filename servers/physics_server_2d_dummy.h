@@ -260,7 +260,7 @@ public:
 	virtual Transform2D body_get_transform_unsafe(RID p_body) const override { return Transform2D(); }
 	virtual Vector2 body_get_position_unsafe(RID p_body) const override { return Vector2(); }
 
-	virtual void body_set_linear_velocity_unsafe(RID p_body, const Vector2 &p_velocity) {}
+	virtual void body_set_linear_velocity_unsafe(RID p_body, const Vector2 &p_velocity) override {}
 	virtual Vector2 body_get_linear_velocity_unsafe(RID p_body) const override { return Vector2(); }
 
 	virtual void body_apply_central_impulse(RID p_body, const Vector2 &p_impulse) override {}
@@ -339,7 +339,7 @@ public:
 	virtual RID cfraycast_create() override { return RID(); }
 	virtual void cfraycast_clear(RID p_cfraycast) override {}
 
-	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to, bool keep_active) override {}
+	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to) override {}
 
 	virtual void cfraycast_set_position(RID p_cfraycast, const Vector2 &p_point) override {}
 	virtual Vector2 cfraycast_get_position(RID p_cfraycast) const override { return Vector2(); }
@@ -353,7 +353,7 @@ public:
 	virtual void cfraycast_set_hit_from_inside(RID p_cfraycast, bool p_enable) override {}
 	virtual bool cfraycast_is_hit_from_inside_enabled(RID p_cfraycast) const override { return false; }
 
-	virtual void cfraycast_activate(RID p_cfraycast, bool p_keep_active) override {}
+	virtual void cfraycast_activate(RID p_cfraycast) override {}
 	virtual void cfraycast_deactivate(RID p_cfraycast) override {}
 
 	virtual bool cfraycast_is_colliding(RID p_cfraycast) const override { return false; }

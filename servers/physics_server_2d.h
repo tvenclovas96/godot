@@ -598,7 +598,7 @@ public:
 	virtual RID cfraycast_create() = 0;
 	virtual void cfraycast_clear(RID p_cfraycast) = 0;
 
-	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to, bool keep_active) = 0;
+	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to) = 0;
 
 	virtual void cfraycast_set_position(RID p_cfraycast, const Vector2 &p_point) = 0;
 	virtual Vector2 cfraycast_get_position(RID p_cfraycast) const = 0;
@@ -612,7 +612,7 @@ public:
 	virtual void cfraycast_set_hit_from_inside(RID p_cfraycast, bool p_enable) = 0;
 	virtual bool cfraycast_is_hit_from_inside_enabled(RID p_cfraycast) const = 0;
 
-	virtual void cfraycast_activate(RID p_cfraycast, bool p_single_frame) = 0;
+	virtual void cfraycast_activate(RID p_cfraycast) = 0;
 	virtual void cfraycast_deactivate(RID p_cfraycast) = 0;
 
 	virtual bool cfraycast_is_colliding(RID p_cfraycast) const = 0;
@@ -666,10 +666,9 @@ struct CFRaycastData {
 	Vector2 from;
 	Vector2 to;
 
-	uint32_t collision_mask = _UI32_MAX;
+	uint32_t collision_mask = UINT32_MAX;
 
 	bool enabled = true;
-	bool keep_enabled = true;
 	bool hit_from_inside = false;
 };
 

@@ -445,7 +445,7 @@ public:
 	EXBIND0R(RID, cfraycast_create)
 	EXBIND1(cfraycast_clear, RID)
 
-	EXBIND4(cfraycast_set_ray, RID, const Vector2 &, const Vector2 &, bool)
+	EXBIND3(cfraycast_set_ray, RID, const Vector2 &, const Vector2 &)
 
 	EXBIND2(cfraycast_set_position, RID, const Vector2 &)
 	EXBIND1RC(Vector2, cfraycast_get_position, RID)
@@ -459,7 +459,7 @@ public:
 	EXBIND2(cfraycast_set_hit_from_inside, RID, bool)
 	EXBIND1RC(bool, cfraycast_is_hit_from_inside_enabled, RID)
 
-	EXBIND2(cfraycast_activate, RID, bool)
+	EXBIND1(cfraycast_activate, RID)
 	EXBIND1(cfraycast_deactivate, RID)
 
 	EXBIND1RC(bool, cfraycast_is_colliding, RID)

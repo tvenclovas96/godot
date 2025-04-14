@@ -19,12 +19,16 @@ public:
 	}
 
 	_FORCE_INLINE_ bool clear_ray(const RID &p_rid) {
-		bool data = ray_data.erase(p_rid);
+		bool ray = ray_data.erase(p_rid);
 		bool result = result_data.erase(p_rid);
+
+		ERR_FAIL_COND_V(ray != result, false); // should never happen, but idk
+
 		if (ray_data.size() == 0) {
 			rid_counter = 0; // reset when empty
 		}
-		return data && result;
+
+		return ray && result;
 	}
 
 	_FORCE_INLINE_ CFRaycastData *get_data_ptr(const RID &p_rid) {
@@ -37,8 +41,6 @@ public:
 	void intersect_rays(GodotSpace2D *p_space);
 
 private:
-	constexpr static uint32_t chunk_size = 1024;
-	uint32_t chunks = 0;
 	uint64_t rid_counter = 0; // just always increment
 
 	// initialize with decent starting capacity

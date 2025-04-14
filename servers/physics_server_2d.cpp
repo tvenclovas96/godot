@@ -805,7 +805,7 @@ void PhysicsServer2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("cfraycast_create"), &PhysicsServer2D::cfraycast_create);
 	ClassDB::bind_method(D_METHOD("cfraycast_clear", "cfraycast"), &PhysicsServer2D::cfraycast_clear);
 
-	ClassDB::bind_method(D_METHOD("cfraycast_set_ray", "cfraycast", "from", "to", "keep_active"), &PhysicsServer2D::cfraycast_set_ray);
+	ClassDB::bind_method(D_METHOD("cfraycast_set_ray", "cfraycast", "from", "to"), &PhysicsServer2D::cfraycast_set_ray);
 
 	ClassDB::bind_method(D_METHOD("cfraycast_set_position", "cfraycast", "point"), &PhysicsServer2D::cfraycast_set_position);
 	ClassDB::bind_method(D_METHOD("cfraycast_get_position", "cfraycast"), &PhysicsServer2D::cfraycast_get_position);
@@ -819,7 +819,7 @@ void PhysicsServer2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("cfraycast_set_hit_from_inside", "cfraycast", "enable"), &PhysicsServer2D::cfraycast_set_hit_from_inside);
 	ClassDB::bind_method(D_METHOD("cfraycast_is_hit_from_inside_enabled", "cfraycast"), &PhysicsServer2D::cfraycast_is_hit_from_inside_enabled);
 
-	ClassDB::bind_method(D_METHOD("cfraycast_activate", "cfraycast", "keep_active"), &PhysicsServer2D::cfraycast_activate);
+	ClassDB::bind_method(D_METHOD("cfraycast_activate", "cfraycast"), &PhysicsServer2D::cfraycast_activate);
 	ClassDB::bind_method(D_METHOD("cfraycast_deactivate", "cfraycast"), &PhysicsServer2D::cfraycast_deactivate);
 
 	ClassDB::bind_method(D_METHOD("cfraycast_is_colliding", "cfraycast"), &PhysicsServer2D::cfraycast_is_colliding);
@@ -833,8 +833,6 @@ void PhysicsServer2D::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("cfraycast_get_collision_point", "cfraycast"), &PhysicsServer2D::cfraycast_get_collision_point);
 	ClassDB::bind_method(D_METHOD("cfraycast_get_collision_normal", "cfraycast"), &PhysicsServer2D::cfraycast_get_collision_normal);
-
-	// ClassDB::bind_method(D_METHOD("cfraycast_set_intersect_callback", "cfraycast", "callback"), &PhysicsServer2D::cfraycast_set_intersect_callback);
 
 	/* MISC */
 

@@ -316,7 +316,7 @@ public:
 	FUNCRID(cfraycast)
 	FUNC1(cfraycast_clear, RID)
 
-	FUNC4(cfraycast_set_ray, RID, const Vector2 &, const Vector2 &, bool);
+	FUNC3(cfraycast_set_ray, RID, const Vector2 &, const Vector2 &);
 
 	FUNC2(cfraycast_set_position, RID, const Vector2 &);
 	FUNC1RC(Vector2, cfraycast_get_position, RID);
@@ -330,7 +330,7 @@ public:
 	FUNC2(cfraycast_set_hit_from_inside, RID, bool);
 	FUNC1RC(bool, cfraycast_is_hit_from_inside_enabled, RID);
 
-	FUNC2(cfraycast_activate, RID, bool);
+	FUNC1(cfraycast_activate, RID);
 	FUNC1(cfraycast_deactivate, RID);
 
 	FUNC1RC(bool, cfraycast_is_colliding, RID);

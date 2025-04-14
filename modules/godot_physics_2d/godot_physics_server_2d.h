@@ -307,7 +307,7 @@ public:
 	virtual RID cfraycast_create() override;
 	virtual void cfraycast_clear(RID p_cfraycast) override;
 
-	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to, bool p_keep_active = true) override;
+	virtual void cfraycast_set_ray(RID p_cfraycast, const Vector2 &p_from, const Vector2 &p_to) override;
 
 	virtual void cfraycast_set_position(RID p_cfraycast, const Vector2 &p_point) override;
 	virtual Vector2 cfraycast_get_position(RID p_cfraycast) const override;
@@ -321,7 +321,7 @@ public:
 	virtual void cfraycast_set_hit_from_inside(RID p_cfraycast, bool p_enable) override;
 	virtual bool cfraycast_is_hit_from_inside_enabled(RID p_cfraycast) const override;
 
-	virtual void cfraycast_activate(RID p_cfraycast, bool p_keep_active) override;
+	virtual void cfraycast_activate(RID p_cfraycast) override;
 	virtual void cfraycast_deactivate(RID p_cfraycast) override;
 
 	virtual bool cfraycast_is_colliding(RID p_cfraycast) const override;

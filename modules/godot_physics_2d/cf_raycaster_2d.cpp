@@ -30,8 +30,7 @@ void CFRaycaster2D::_intersect(uint32_t i) {
 	if (!data.enabled) {
 		return;
 	}
-
-	data.enabled = data.keep_enabled;
+	data.enabled = false;
 
 	CFRaycastResult &result = result_data.get_by_index(i).value;
 	current_space->intersect_ray_lean(data, result);
