@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 #nullable enable
@@ -1119,5 +1120,33 @@ namespace Godot
         {
             return $"({X.ToString(format, CultureInfo.InvariantCulture)}, {Y.ToString(format, CultureInfo.InvariantCulture)})";
         }
+
+#if REAL_T_IS_DOUBLE
+#else // if NOT real_t is double
+
+        /// <summary>
+        /// Implicit conversion to (better!, sorry Godot) System.Numerics.Vector2,
+        /// directly copying entire struct instead of both floats one-by-one
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
+
+        public static implicit operator System.Numerics.Vector2(Vector2 vec)
+        {
+            return Unsafe.BitCast<Vector2, System.Numerics.Vector2>(vec);
+        }
+
+        /// <summary>
+        /// Implicit conversion from (better!, sorry Godot) System.Numerics.Vector2,
+        /// directly copying entire struct instead of both floats one-by-one
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
+        public static implicit operator Vector2(System.Numerics.Vector2 vec)
+        {
+            return Unsafe.BitCast<System.Numerics.Vector2, Vector2>(vec);
+        }
     }
+#endif
+
 }
